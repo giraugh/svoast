@@ -98,13 +98,13 @@ class ToastState {
 	warning: ToastFunction = (message, opts = DEFAULT_OPTIONS) => this.#addToast('warning', message, { opts });
 	error: ToastFunction = (message, opts = DEFAULT_OPTIONS) => this.#addToast('error', message, { opts });
 	promise: ToastPromiseFunction = (promise, opts) => {
-		if (promise instanceof Promise === false) throw Error('`promise` is not a valid Promise.');
+		const resolvedPromise = Promise.resolve(promise);
 
 		const id = this.#addToast('promise', opts.loading, { opts });
 
 		opts.onStart?.();
 
-		promise
+		resolvedPromise
 			.then((data) => {
 				const message = typeof opts.success === 'string' ? opts.success : opts.success(data);
 				this.#addToast('success', message, { opts, id });
@@ -127,7 +127,7 @@ class ToastState {
 				opts?.onFinish?.();
 			});
 
-		return promise;
+		return resolvedPromise;
 	};
 }
 
